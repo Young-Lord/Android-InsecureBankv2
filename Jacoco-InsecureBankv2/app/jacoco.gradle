@@ -1,0 +1,72 @@
+apply plugin: 'jacoco'
+
+android {
+    buildTypes {
+        debug {
+            /**打开覆盖率统计开关**/
+            testCoverageEnabled = true
+        }
+        release {
+            testCoverageEnabled = true
+        }
+    }
+}
+
+//源代码路径，有多少个module，就在这里写多少个路径，如果你只有app一个module，那么就写一个就可以
+def coverageSourceDirs = [
+        '../app/src/main/java',
+]
+
+//class文件路径，如果你只有app一个module，那么就写一个就可以
+def coverageClassDirs = [
+        '/app/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes',
+]
+
+//Jacoco 版本，建议用这个版本兼容性比较好
+jacoco {
+    toolVersion = "0.8.2"
+}
+
+//生成报告task
+task jacocoTestReport(type: JacocoReport) {
+    group = "JacocoReport"
+    description = "Generate Jacoco coverage reports after running tests."
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+    classDirectories = files(files(coverageClassDirs).files.collect {
+        println("$rootDir" + it)
+        fileTree(dir: "$rootDir" + it,
+                // 过滤不需要统计的class文件
+                excludes: ['**/R*.class',
+                           '**/*$InjectAdapter.class',
+                           '**/*$ModuleAdapter.class',
+                           '**/*$ViewInjector*.class'
+                ])
+    })
+    sourceDirectories = files(coverageSourceDirs)
+    executionData = files("$buildDir/outputs/code-coverage/coverage.ec")
+
+    doFirst {
+        coverageClassDirs.each { path ->
+            println("$rootDir" + path)
+            new File("$rootDir" + path).eachFileRecurse { file ->
+                if (file.name.contains('$$')) {
+                    file.renameTo(file.path.replace('$$', '$'))
+                }
+            }
+        }
+    }
+}
+
+//初始化Jacoco Task
+task jacocoInit() {
+    group = "JacocoReport"
+    doFirst {
+        File file = new File("$buildDir/outputs/code-coverage/")
+        if (!file.exists()) {
+            file.mkdir()
+        }
+    }
+}
