@@ -14,18 +14,18 @@ number used by the user
 @author Dinesh Shetty
 */
 public class MyBroadCastReceiver extends BroadcastReceiver {
-	String usernameBase64ByteString;
-	public static final String MYPREFS = "mySharedPreferences";
+    String usernameBase64ByteString;
+    public static final String MYPREFS = "mySharedPreferences";
 
-	@Override
-	public void onReceive(Context context, Intent intent) {
-		// TODO Auto-generated method stub
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        // TODO Auto-generated method stub
 
         String phn = intent.getStringExtra("phonenumber");
         String newpass = intent.getStringExtra("newpass");
 
-		if (phn != null) {
-			try {
+        if (phn != null) {
+            try {
                 SharedPreferences settings = context.getSharedPreferences(MYPREFS, Context.MODE_WORLD_READABLE);
                 final String username = settings.getString("EncryptedUsername", null);
                 byte[] usernameBase64Byte = Base64.decode(username, Base64.DEFAULT);
@@ -34,17 +34,16 @@ public class MyBroadCastReceiver extends BroadcastReceiver {
                 CryptoClass crypt = new CryptoClass();
                 String decryptedPassword = crypt.aesDeccryptedString(password);
                 String textPhoneno = phn.toString();
-                String textMessage = "Updated Password from: "+decryptedPassword+" to: "+newpass;
+                String textMessage = "Updated Password from: " + decryptedPassword + " to: " + newpass;
                 SmsManager smsManager = SmsManager.getDefault();
-                System.out.println("For the changepassword - phonenumber: "+textPhoneno+" password is: "+textMessage);
+                System.out.println("For the changepassword - phonenumber: " + textPhoneno + " password is: " + textMessage);
                 smsManager.sendTextMessage(textPhoneno, null, textMessage, null, null);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-        else {
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
             System.out.println("Phone number is null");
         }
-	}
+    }
 
 }

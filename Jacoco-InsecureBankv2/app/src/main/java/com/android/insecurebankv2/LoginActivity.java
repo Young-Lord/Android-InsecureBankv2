@@ -33,35 +33,36 @@ pages on a successful authentication
 @author Dinesh Shetty
 */
 public class LoginActivity extends Activity {
-	//	The Button that calls the authentication function
-	Button login_buttons;
+    //	The Button that calls the authentication function
+    Button login_buttons;
     //	The Button that calls the create user function
     Button createuser_buttons;
     //	The EditText that holds the username entered by the user
-	EditText Username_Text;
-	//	The EditText that holds the password entered by the user
-	EditText Password_Text;
-	//	The Button that allows the user to autofill the credentials, 
-	//  if the user has logged in successfully earlier
-	Button fillData_button;
-	String usernameBase64ByteString;
-	public static final String MYPREFS = "mySharedPreferences";
+    EditText Username_Text;
+    //	The EditText that holds the password entered by the user
+    EditText Password_Text;
+    //	The Button that allows the user to autofill the credentials,
+    //  if the user has logged in successfully earlier
+    Button fillData_button;
+    String usernameBase64ByteString;
+    public static final String MYPREFS = "mySharedPreferences";
     private JacocoHelper rec;
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_log_main);
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_log_main);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(JacocoHelper.ACTION);
-        rec=new JacocoHelper();
-        registerReceiver(rec,intentFilter);
-		String mess = getResources().getString(R.string.is_admin);
-		if (mess.equals("no")) {
-			View button_CreateUser = findViewById(R.id.button_CreateUser);
-			button_CreateUser.setVisibility(View.GONE);
-		}
-		login_buttons = (Button) findViewById(R.id.login_button);
-		login_buttons.setOnClickListener(new View.OnClickListener() {
+        rec = new JacocoHelper();
+        registerReceiver(rec, intentFilter);
+        String mess = getResources().getString(R.string.is_admin);
+        if (mess.equals("no")) {
+            View button_CreateUser = findViewById(R.id.button_CreateUser);
+            button_CreateUser.setVisibility(View.GONE);
+        }
+        login_buttons = (Button) findViewById(R.id.login_button);
+        login_buttons.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -111,7 +112,7 @@ public class LoginActivity extends Activity {
 //            }
 //        });
 
-	}
+    }
 
     /*
     The function that allows the user to create new user credentials.
@@ -129,15 +130,14 @@ public class LoginActivity extends Activity {
     if the user has logged in successfully atleast one earlier using
     that device
     */
-	protected void fillData() throws UnsupportedEncodingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
-		// TODO Auto-generated method stub
-		SharedPreferences settings = getSharedPreferences(MYPREFS, 0);
-		final String username = settings.getString("EncryptedUsername", null);
+    protected void fillData() throws UnsupportedEncodingException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+        // TODO Auto-generated method stub
+        SharedPreferences settings = getSharedPreferences(MYPREFS, 0);
+        final String username = settings.getString("EncryptedUsername", null);
         final String password = settings.getString("superSecurePassword", null);
 
 
-        if(username!=null && password!=null)
-        {
+        if (username != null && password != null) {
             byte[] usernameBase64Byte = Base64.decode(username, Base64.DEFAULT);
             try {
                 usernameBase64ByteString = new String(usernameBase64Byte, "UTF-8");
@@ -151,66 +151,63 @@ public class LoginActivity extends Activity {
             CryptoClass crypt = new CryptoClass();
             String decryptedPassword = crypt.aesDeccryptedString(password);
             Password_Text.setText(decryptedPassword);
-        }
-        else if (username==null || password==null)
-        {
-          //  Toast.makeText(this, "No stored credentials found!!", Toast.LENGTH_LONG).show();
-        }
-        else
-        {
-          //  Toast.makeText(this, "No stored credentials found!!", Toast.LENGTH_LONG).show();
+        } else if (username == null || password == null) {
+            //  Toast.makeText(this, "No stored credentials found!!", Toast.LENGTH_LONG).show();
+        } else {
+            //  Toast.makeText(this, "No stored credentials found!!", Toast.LENGTH_LONG).show();
         }
 
-	}
+    }
 
-	/*
-	The function that passes the control on to the authentication module
-	Username_Text: Username entered by the user
-	Password_Text: password entered by the user
-	*/
-	protected void performlogin() {
-		// TODO Auto-generated method stub
-		Username_Text = (EditText) findViewById(R.id.loginscreen_username);
-		Password_Text = (EditText) findViewById(R.id.loginscreen_password);
-		Intent i = new Intent(this, DoLogin.class);
-		i.putExtra("passed_username", Username_Text.getText().toString());
-		i.putExtra("passed_password", Password_Text.getText().toString());
-		startActivity(i);
-	}
+    /*
+    The function that passes the control on to the authentication module
+    Username_Text: Username entered by the user
+    Password_Text: password entered by the user
+    */
+    protected void performlogin() {
+        // TODO Auto-generated method stub
+        Username_Text = (EditText) findViewById(R.id.loginscreen_username);
+        Password_Text = (EditText) findViewById(R.id.loginscreen_password);
+        Intent i = new Intent(this, DoLogin.class);
+        i.putExtra("passed_username", Username_Text.getText().toString());
+        i.putExtra("passed_password", Password_Text.getText().toString());
+        startActivity(i);
+    }
 
-	// Added for handling menu operations
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-	// Added for handling menu operations
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar wil
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			callPreferences();
-			return true;
-		} else if (id == R.id.action_exit) {
-			Intent i = new Intent(getBaseContext(), LoginActivity.class);
-			i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(i);
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-
-	public void callPreferences() {
-		// TODO Auto-generated method stub
-		Intent i = new Intent(this, FilePrefActivity.class);
-		startActivity(i);
-	}
+    // Added for handling menu operations
     @Override
-    public void onDestroy(){
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    // Added for handling menu operations
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar wil
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            callPreferences();
+            return true;
+        } else if (id == R.id.action_exit) {
+            Intent i = new Intent(getBaseContext(), LoginActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void callPreferences() {
+        // TODO Auto-generated method stub
+        Intent i = new Intent(this, FilePrefActivity.class);
+        startActivity(i);
+    }
+
+    @Override
+    public void onDestroy() {
         unregisterReceiver(rec);
         super.onDestroy();
     }

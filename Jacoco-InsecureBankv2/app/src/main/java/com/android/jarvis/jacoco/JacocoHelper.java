@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -21,12 +22,13 @@ public class JacocoHelper extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        DEFAULT_COVERAGE_FILE_PATH = context.getExternalFilesDir(null)+"/coverage.ec";
+        DEFAULT_COVERAGE_FILE_PATH = context.getExternalFilesDir(null) + "/coverage.ec";
         // /sdcard/Android/data/<package_name>/files/coverage.ec
         generateEcFile(true);
         Toast.makeText(context, "myReceiver receive", Toast.LENGTH_SHORT)
                 .show();
     }
+
     /**
      * 生成ec文件
      *
@@ -35,7 +37,7 @@ public class JacocoHelper extends BroadcastReceiver {
     public static void generateEcFile(boolean isNew) {
         OutputStream out = null;
         File mCoverageFilePath = new File(DEFAULT_COVERAGE_FILE_PATH);
-        Log.e(TAG, "DUMP to "+DEFAULT_COVERAGE_FILE_PATH);
+        Log.e(TAG, "DUMP to " + DEFAULT_COVERAGE_FILE_PATH);
         try {
             if (isNew && mCoverageFilePath.exists()) {
                 Log.e(TAG, "清除旧的ec文件");
